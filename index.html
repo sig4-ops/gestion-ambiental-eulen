@@ -9,6 +9,7 @@
 </head>
 <body class="bg-slate-50 text-slate-800 font-sans">
 
+  <!-- CABECERA -->
   <header class="bg-emerald-900 text-white shadow-md">
     <div class="max-w-6xl mx-auto px-4 py-4 flex flex-wrap justify-between items-center gap-4">
       <div>
@@ -24,9 +25,13 @@
 
   <main class="max-w-6xl mx-auto px-4 py-6">
 
+    <!-- SECCIÓN 1: TABLERO Y GRÁFICOS -->
     <section id="sec-tablero" class="space-y-6">
+
+      <!-- BARRA DE BOTONES POR INDICADOR + DESPLEGABLE DE SEDE -->
       <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200 space-y-4">
         <div class="flex flex-wrap justify-between items-center gap-3">
+          <!-- Botones por Indicador -->
           <div class="flex flex-wrap gap-2" id="botones-recurso">
             <button onclick="seleccionarRecurso('LUZ')" data-rec="LUZ" class="btn-rec px-4 py-2 rounded-lg text-sm font-bold bg-emerald-600 text-white shadow-sm">⚡ Luz (kWh)</button>
             <button onclick="seleccionarRecurso('AGUA')" data-rec="AGUA" class="btn-rec px-4 py-2 rounded-lg text-sm font-bold bg-slate-100 text-slate-700 hover:bg-slate-200">💧 Agua (m³)</button>
@@ -34,6 +39,7 @@
             <button onclick="seleccionarRecurso('COMBUSTIBLE')" data-rec="COMBUSTIBLE" class="btn-rec px-4 py-2 rounded-lg text-sm font-bold bg-slate-100 text-slate-700 hover:bg-slate-200">⛽ Combustible (gal)</button>
           </div>
 
+          <!-- Desplegable de Sede (General + Individuales) + Botón Refrescar -->
           <div class="flex flex-wrap items-center gap-2">
             <select id="filtro-sede" onchange="actualizarGraficos()" class="border border-slate-300 rounded-lg px-3 py-2 text-sm font-semibold bg-slate-50 text-slate-800">
               <option value="GENERAL">🏢 Consolidado General (Todas las Sedes)</option>
@@ -44,14 +50,15 @@
               <option value="EULEN PUEBLO LIBRE">Sede: EULEN PUEBLO LIBRE (380 m²)</option>
               <option value="EULEN SANTA ANITA">Sede: EULEN SANTA ANITA (950 m²)</option>
             </select>
-            <button onclick="cargarDatosEnVivo()" id="btn-sync" class="px-3 py-2 rounded-lg text-xs font-bold bg-slate-800 text-white hover:bg-slate-700">
+            <button onclick="cargarDatosEnVivo()" id="btn-sync" class="px-3 py-2 rounded-lg text-xs font-bold bg-slate-800 text-white hover:bg-slate-700" title="Sincronizar con Google Sheets">
               🔄 Actualizar
             </button>
           </div>
         </div>
-        <p id="estado-sync" class="text-xs text-slate-500">Cargando datos...</p>
+        <p id="estado-sync" class="text-xs text-slate-500">Cargando datos en vivo desde Google Sheets...</p>
       </div>
 
+      <!-- TARJETAS KPI (INCLUYE TOTAL POR ÁREA) -->
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
         <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200">
           <p class="text-xs text-slate-500 font-semibold uppercase">Área Evaluada</p>
@@ -80,6 +87,7 @@
         </div>
       </div>
 
+      <!-- GRÁFICO PRINCIPAL + TABLA COMPARATIVA POR SEDE -->
       <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 lg:col-span-2">
           <h3 id="titulo-grafico" class="font-bold text-sm text-slate-700 mb-4">Evolución Mensual: KPI Real vs Meta Fija</h3>
@@ -106,6 +114,7 @@
       </div>
     </section>
 
+    <!-- SECCIÓN 2: FORMULARIO PÚBLICO DE BOLETAS -->
     <section id="sec-formulario" class="hidden max-w-2xl mx-auto">
       <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
         <h2 class="text-lg font-bold text-slate-800 mb-1">📤 Reportar Boleta de Consumo Ambiental</h2>
@@ -204,7 +213,7 @@
     // =====================================================================
     // PEGA AQUÍ TU URL /exec DE GOOGLE APPS SCRIPT:
     // =====================================================================
-    const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyy4G51X9_Rx02_tAhlzO7COPLO3YP6mivGszaePN9Wt_aEbAgBqtJqV9OLN6LX16I/exec";
+    const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbypdUbs0klNZDay8glfjmYNg8W4WoUoO7UkRqj3Pm-jddif9YU7iU9bM97urREIgcL2/exec";
 
     const mesesOrden = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
     const unidadesMap = {
@@ -214,6 +223,7 @@
       COMBUSTIBLE: { u: "gal", huellaU: "kg CO₂e", factor: 10.15, meta: 0.03, tituloHuella: "Huella de Carbono" }
     };
 
+    // Datos iniciales de respaldo (Ene-Oct 2026) mientras sincroniza con Google Sheets
     let areasSedes = {
       "EULEN SUR": 165, "EULEN NORTE": 2977, "EULEN ATE": 1200,
       "EULEN SAN ISIDRO": 450, "EULEN PUEBLO LIBRE": 380, "EULEN SANTA ANITA": 950
@@ -256,7 +266,6 @@
     async function cargarDatosEnVivo() {
       const statusEl = document.getElementById('estado-sync');
       statusEl.innerText = "🔄 Sincronizando con Google Sheets...";
-      actualizarGraficos(); // Dibuja de inmediato con los datos base mientras conecta
       try {
         const res = await fetch(GOOGLE_SCRIPT_URL);
         const json = await res.json();
@@ -276,7 +285,8 @@
           actualizarGraficos();
         }
       } catch (e) {
-        statusEl.innerText = "⚠️ Mostrando datos locales de respaldo (Sur y Norte Ene–Oct 2026).";
+        statusEl.innerText = "⚠️ Mostrando datos locales de respaldo (verifica la URL de Google Script para lectura en vivo).";
+        actualizarGraficos();
       }
     }
 
@@ -284,17 +294,23 @@
       const sedeSel = document.getElementById('filtro-sede').value;
       const cfg = unidadesMap[recursoActual];
 
+      // Filtrar registros del recurso seleccionado
       const filtrados = registrosData.filter(r =>
         r.recurso === recursoActual && (sedeSel === "GENERAL" || r.sede === sedeSel)
       );
 
-      let areaTotal = sedeSel === "GENERAL"
-        ? Object.values(areasSedes).reduce((a, b) => a + b, 0)
-        : (areasSedes[sedeSel] || 1);
+      // Calcular área evaluada (Total de todas las sedes o de la sede elegida)
+      let areaTotal = 0;
+      if (sedeSel === "GENERAL") {
+        areaTotal = Object.values(areasSedes).reduce((a, b) => a + b, 0);
+      } else {
+        areaTotal = areasSedes[sedeSel] || 1;
+      }
 
       const consumoAcum = filtrados.reduce((a, b) => a + b.consumo, 0);
       const gastoAcum = filtrados.reduce((a, b) => a + b.monto, 0);
 
+      // Agrupar consumo por mes para calcular KPI mensual (Consumo del mes / Área)
       const porMes = mesesOrden.map(m => {
         const sumMes = filtrados.filter(r => r.mes === m).reduce((a, b) => a + b.consumo, 0);
         return sumMes > 0 ? +(sumMes / areaTotal).toFixed(4) : null;
@@ -307,6 +323,7 @@
       const totalPorAreaAcum = +(consumoAcum / areaTotal).toFixed(3);
       const huella = +(consumoAcum * cfg.factor).toFixed(1);
 
+      // Actualizar Tarjetas
       document.getElementById('kpi-area').innerText = `${areaTotal.toLocaleString()} m²`;
       document.getElementById('kpi-area-sub').innerText = sedeSel === "GENERAL" ? "Área total 6 sedes" : sedeSel;
       document.getElementById('kpi-acum').innerText = `${consumoAcum.toLocaleString()} ${cfg.u}`;
@@ -320,6 +337,7 @@
       document.getElementById('kpi-huella').innerText = `${huella.toLocaleString()} ${cfg.huellaU}`;
       document.getElementById('kpi-factor').innerText = `Factor: ${cfg.factor} ${cfg.huellaU}/${cfg.u}`;
 
+      // Actualizar Tabla Desglose por Sede
       const tbody = document.getElementById('tabla-sedes');
       tbody.innerHTML = "";
       Object.keys(areasSedes).forEach(s => {
@@ -335,6 +353,7 @@
           </tr>`;
       });
 
+      // Actualizar Gráfico
       document.getElementById('titulo-grafico').innerText =
         `Evolución Mensual (${recursoActual} - ${sedeSel}): Ratio Real (${cfg.u}/m²) vs Meta (${cfg.meta})`;
 
