@@ -88,12 +88,12 @@ HTML
           <div class="flex flex-wrap items-center gap-2">
             <select id="filtro-sede" onchange="actualizarGraficos()" class="border border-slate-300 rounded-lg px-3 py-2 text-sm font-semibold bg-slate-50 text-slate-800">
               <option value="GENERAL">🏢 Consolidado General (Todas las Sedes)</option>
-              <option value="EULEN SUR">Sede: EULEN SUR (165 m²)</option>
-              <option value="EULEN NORTE">Sede: EULEN NORTE (2,977 m²)</option>
-              <option value="EULEN ATE">Sede: EULEN ATE (1,200 m²)</option>
-              <option value="EULEN SAN ISIDRO">Sede: EULEN SAN ISIDRO (450 m²)</option>
-              <option value="EULEN PUEBLO LIBRE">Sede: EULEN PUEBLO LIBRE (380 m²)</option>
-              <option value="EULEN SANTA ANITA">Sede: EULEN SANTA ANITA (950 m²)</option>
+              <option value="EULEN OFICINA AREQUIPA">Sede: EULEN OFICINA AREQUIPA</option>
+              <option value="EULEN OFICINA TRUJILLO">Sede: EULEN OFICINA TRUJILLO</option>
+              <option value="EULEN ATE">Sede: EULEN ATE</option>
+              <option value="EULEN SAN ISIDRO">Sede: EULEN SAN ISIDRO</option>
+              <option value="EULEN PUEBLO LIBRE">Sede: EULEN PUEBLO LIBRE</option>
+              <option value="EULEN SANTA ANITA">Sede: EULEN SANTA ANITA</option>
             </select>
             <button onclick="cargarDatosEnVivo()" id="btn-sync"
               style="background-color: #F5333F; color: #FFFFFF;"
@@ -108,7 +108,7 @@ HTML
       <!-- TARJETAS KPI -->
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
         <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200">
-          <p class="text-xs text-slate-500 font-semibold uppercase">Área Evaluada</p>
+          <p id="lbl-base" class="text-xs text-slate-500 font-semibold uppercase">Área Evaluada</p>
           <p id="kpi-area" class="text-2xl font-bold text-slate-800 mt-1">3,142 m²</p>
           <p id="kpi-area-sub" class="text-xs text-slate-500 mt-1">Suma de sedes seleccionadas</p>
         </div>
@@ -118,8 +118,8 @@ HTML
           <p id="kpi-gasto" class="text-xs font-semibold mt-1" style="color: #739600;">Gasto: S/ 0.00</p>
         </div>
         <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200">
-          <p class="text-xs text-slate-500 font-semibold uppercase">Total por Área (KPI)</p>
-          <!-- Valor Total por Área en Pantone 281 C (#002664) -->
+          <p id="lbl-kpi" class="text-xs text-slate-500 font-semibold uppercase">Total por Área (KPI)</p>
+          <!-- Valor Total por Área / Persona en Pantone 281 C (#002664) -->
           <p id="kpi-ratio" class="text-2xl font-bold mt-1" style="color: #002664;">0.000</p>
           <p id="kpi-estado" class="text-xs font-semibold text-slate-500 mt-1">Consumo / m²</p>
         </div>
@@ -127,7 +127,7 @@ HTML
           <p class="text-xs text-slate-500 font-semibold uppercase">Meta Fija</p>
           <!-- Valor Meta Fija en Pantone Red 032 C (#F5333F) -->
           <p id="kpi-meta" class="text-2xl font-bold mt-1" style="color: #F5333F;">2.580</p>
-          <p class="text-xs text-slate-500 mt-1">Límite mensual por m²</p>
+          <p id="kpi-meta-sub" class="text-xs text-slate-500 mt-1">Límite mensual por m²</p>
         </div>
         <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200">
           <p id="lbl-huella" class="text-xs text-slate-500 font-semibold uppercase">Huella de Carbono</p>
@@ -152,14 +152,14 @@ HTML
         </div>
 
         <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
-          <h3 class="font-bold text-sm text-slate-700 mb-3">Desglose por Sede (Total y por m²)</h3>
+          <h3 id="titulo-tabla" class="font-bold text-sm text-slate-700 mb-3">Desglose por Sede (Total y por m²)</h3>
           <div class="overflow-x-auto">
             <table class="w-full text-xs text-left">
               <thead class="bg-slate-100 text-slate-600 uppercase">
                 <tr>
                   <th class="p-2">Sede</th>
                   <th class="p-2 text-right">Consumo</th>
-                  <th class="p-2 text-right">KPI / m²</th>
+                  <th id="th-kpi" class="p-2 text-right">KPI / m²</th>
                 </tr>
               </thead>
               <tbody id="tabla-sedes" class="divide-y divide-slate-100"></tbody>
@@ -180,8 +180,8 @@ HTML
             <div>
               <label class="block text-xs font-bold text-slate-700 mb-1">Sede EULEN *</label>
               <select id="sede" required class="w-full border border-slate-300 rounded-lg p-2.5 text-sm">
-                <option value="EULEN SUR">EULEN SUR (Arequipa)</option>
-                <option value="EULEN NORTE">EULEN NORTE</option>
+                <option value="EULEN OFICINA AREQUIPA">EULEN OFICINA AREQUIPA</option>
+                <option value="EULEN OFICINA TRUJILLO">EULEN OFICINA TRUJILLO</option>
                 <option value="EULEN ATE">EULEN ATE</option>
                 <option value="EULEN SAN ISIDRO">EULEN SAN ISIDRO</option>
                 <option value="EULEN PUEBLO LIBRE">EULEN PUEBLO LIBRE</option>
@@ -266,13 +266,12 @@ HTML
 
   <script>
     // =====================================================================
-    // 1. PEGA AQUÍ TU URL /exec DE GOOGLE APPS SCRIPT:
+    // 1. URL /exec DE GOOGLE APPS SCRIPT:
     // =====================================================================
     const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbypdUbs0klNZDay8glfjmYNg8W4WoUoO7UkRqj3Pm-jddif9YU7iU9bM97urREIgcL2/exec";
 
     // =====================================================================
-    // 2. PEGA AQUÍ EL LINK COMPARTIDO DE GOOGLE DRIVE DE TU LOGO EULEN:
-    //    (Asegúrate de que en Drive esté como "Cualquier persona con el enlace")
+    // 2. LINK COMPARTIDO DE GOOGLE DRIVE DEL LOGO EULEN:
     // =====================================================================
     const LOGO_DRIVE_URL = "https://drive.google.com/file/d/1KJGPFT2WWTYzQCo9iQ8MJbMSi-gvd5Bw/view?usp=sharing";
 
@@ -324,22 +323,35 @@ HTML
 
     const mesesOrden = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
     const unidadesMap = {
-      LUZ: { u: "kWh", huellaU: "kg CO₂e", factor: 0.203, meta: 2.58, tituloHuella: "Huella de Carbono" },
-      AGUA: { u: "m³", huellaU: "m³ H₂O eq", factor: 1.15, meta: 0.045, tituloHuella: "Huella Hídrica" },
-      PAPEL: { u: "kg", huellaU: "kg CO₂e", factor: 1.84, meta: 0.025, tituloHuella: "Huella de Carbono" },
-      COMBUSTIBLE: { u: "gal", huellaU: "kg CO₂e", factor: 10.15, meta: 0.03, tituloHuella: "Huella de Carbono" }
+      LUZ: { u: "kWh", baseU: "m²", huellaU: "kg CO₂e", factor: 0.203, meta: 2.58, tituloHuella: "Huella de Carbono" },
+      AGUA: { u: "m³", baseU: "pers.", huellaU: "m³ H₂O eq", factor: 1.15, meta: 1.20, tituloHuella: "Huella Hídrica" },
+      PAPEL: { u: "kg", baseU: "m²", huellaU: "kg CO₂e", factor: 1.84, meta: 0.025, tituloHuella: "Huella de Carbono" },
+      COMBUSTIBLE: { u: "gal", baseU: "m²", huellaU: "kg CO₂e", factor: 10.15, meta: 0.03, tituloHuella: "Huella de Carbono" }
     };
 
-    let areasSedes = {
-      "EULEN SUR": 165, "EULEN NORTE": 2977, "EULEN ATE": 1200,
-      "EULEN SAN ISIDRO": 450, "EULEN PUEBLO LIBRE": 380, "EULEN SANTA ANITA": 950
+    // Normalizador de nombres de sede (compatibilidad entre nombres anteriores y actuales)
+    function normalizarSede(nombre) {
+      const n = String(nombre || "").trim().toUpperCase();
+      if (n === "EULEN SUR" || n === "SUR") return "EULEN OFICINA AREQUIPA";
+      if (n === "EULEN NORTE" || n === "NORTE") return "EULEN OFICINA TRUJILLO";
+      return n;
+    }
+
+    let datosSedesInfo = {
+      "EULEN OFICINA AREQUIPA": { area: 165, personas: 15 },
+      "EULEN OFICINA TRUJILLO": { area: 2977, personas: 45 },
+      "EULEN ATE": { area: 1200, personas: 30 },
+      "EULEN SAN ISIDRO": { area: 450, personas: 35 },
+      "EULEN PUEBLO LIBRE": { area: 380, personas: 20 },
+      "EULEN SANTA ANITA": { area: 950, personas: 25 }
     };
+
     let registrosData = [
       ...["Enero","Febrero","Marzo","Abril","Mayo","Junio","Julio","Agosto","Septiembre","Octubre"].map((m, i) => ({
-        sede: "EULEN SUR", anio: 2026, mes: m, recurso: "LUZ", consumo: [999,790,715,709,761,823,683,765,776,886][i], monto: 0
+        sede: "EULEN OFICINA AREQUIPA", anio: 2026, mes: m, recurso: "LUZ", consumo: [999,790,715,709,761,823,683,765,776,886][i], monto: 0
       })),
       ...["Enero","Febrero","Marzo","Abril","Mayo","Junio","Julio","Agosto","Septiembre","Octubre"].map((m, i) => ({
-        sede: "EULEN NORTE", anio: 2026, mes: m, recurso: "LUZ", consumo: [216,364,730,717,458,490,495.83,261,343,371][i], monto: 0
+        sede: "EULEN OFICINA TRUJILLO", anio: 2026, mes: m, recurso: "LUZ", consumo: [216,364,730,717,458,490,495.83,261,343,371][i], monto: 0
       }))
     ];
 
@@ -391,8 +403,23 @@ HTML
         const res = await fetch(GOOGLE_SCRIPT_URL);
         const json = await res.json();
         if (json.status === "ok") {
-          if (Object.keys(json.sedes).length > 0) areasSedes = json.sedes;
-          if (json.registros.length > 0) registrosData = json.registros;
+          if (json.sedes && Object.keys(json.sedes).length > 0) {
+            const nuevasSedes = {};
+            Object.keys(json.sedes).forEach(k => {
+              const nombreNorm = normalizarSede(k);
+              const val = json.sedes[k];
+              nuevasSedes[nombreNorm] = typeof val === "object"
+                ? { area: Number(val.area) || 1, personas: Number(val.personas) || 1 }
+                : { area: Number(val) || 1, personas: (datosSedesInfo[nombreNorm]?.personas || 15) };
+            });
+            datosSedesInfo = { ...datosSedesInfo, ...nuevasSedes };
+          }
+          if (json.registros && json.registros.length > 0) {
+            registrosData = json.registros.map(r => ({
+              ...r,
+              sede: normalizarSede(r.sede)
+            }));
+          }
           if (json.metas) {
             Object.keys(json.metas).forEach(k => {
               if (unidadesMap[k]) {
@@ -411,54 +438,73 @@ HTML
       }
     }
 
+    function obtenerBaseSede(sedeNombre, recurso) {
+      const info = datosSedesInfo[sedeNombre] || { area: 1, personas: 1 };
+      return recurso === "AGUA" ? info.personas : info.area;
+    }
+
     function actualizarGraficos() {
       const sedeSel = document.getElementById('filtro-sede').value;
       const cfg = unidadesMap[recursoActual];
+      const esAgua = recursoActual === "AGUA";
       const mostrarMeta = document.getElementById('chk-mostrar-meta').checked;
 
       const filtrados = registrosData.filter(r =>
         r.recurso === recursoActual && (sedeSel === "GENERAL" || r.sede === sedeSel)
       );
 
-      let areaTotal = sedeSel === "GENERAL"
-        ? Object.values(areasSedes).reduce((a, b) => a + b, 0)
-        : (areasSedes[sedeSel] || 1);
+      let baseTotal = 0;
+      if (sedeSel === "GENERAL") {
+        baseTotal = Object.keys(datosSedesInfo).reduce((acc, s) => acc + obtenerBaseSede(s, recursoActual), 0);
+      } else {
+        baseTotal = obtenerBaseSede(sedeSel, recursoActual);
+      }
 
       const consumoAcum = filtrados.reduce((a, b) => a + b.consumo, 0);
       const gastoAcum = filtrados.reduce((a, b) => a + b.monto, 0);
 
       const porMes = mesesOrden.map(m => {
         const sumMes = filtrados.filter(r => r.mes === m).reduce((a, b) => a + b.consumo, 0);
-        return sumMes > 0 ? +(sumMes / areaTotal).toFixed(4) : null;
+        return sumMes > 0 ? +(sumMes / baseTotal).toFixed(4) : null;
       });
 
       const mesesConDatos = porMes.filter(v => v !== null);
       const promKpiMensual = mesesConDatos.length > 0
         ? +(mesesConDatos.reduce((a, b) => a + b, 0) / mesesConDatos.length).toFixed(3)
         : 0;
-      const totalPorAreaAcum = +(consumoAcum / areaTotal).toFixed(3);
+      const totalPorBaseAcum = +(consumoAcum / baseTotal).toFixed(3);
       const huella = +(consumoAcum * cfg.factor).toFixed(1);
 
-      document.getElementById('kpi-area').innerText = `${areaTotal.toLocaleString()} m²`;
-      document.getElementById('kpi-area-sub').innerText = sedeSel === "GENERAL" ? "Área total 6 sedes" : sedeSel;
+      // Actualizar Tarjetas dinámicamente (m² vs N° de Personas)
+      document.getElementById('lbl-base').innerText = esAgua ? "Personal Evaluado" : "Área Evaluada";
+      document.getElementById('kpi-area').innerText = `${baseTotal.toLocaleString()} ${cfg.baseU}`;
+      document.getElementById('kpi-area-sub').innerText = sedeSel === "GENERAL" ? "Total 6 sedes" : sedeSel;
+
       document.getElementById('kpi-acum').innerText = `${consumoAcum.toLocaleString()} ${cfg.u}`;
       document.getElementById('kpi-gasto').innerText = `Gasto: S/ ${gastoAcum.toLocaleString('es-PE', {minimumFractionDigits: 2})}`;
 
-      document.getElementById('kpi-ratio').innerText = `${promKpiMensual} ${cfg.u}/m²`;
-      document.getElementById('kpi-estado').innerText = `Acumulado/m²: ${totalPorAreaAcum} ${cfg.u}/m²`;
-      document.getElementById('kpi-meta').innerText = `${cfg.meta} ${cfg.u}/m²`;
+      document.getElementById('lbl-kpi').innerText = esAgua ? "Consumo por Persona" : "Total por Área (KPI)";
+      document.getElementById('kpi-ratio').innerText = `${promKpiMensual} ${cfg.u}/${cfg.baseU}`;
+      document.getElementById('kpi-estado').innerText = `Acumulado: ${totalPorBaseAcum} ${cfg.u}/${cfg.baseU}`;
+
+      document.getElementById('kpi-meta').innerText = `${cfg.meta} ${cfg.u}/${cfg.baseU}`;
+      document.getElementById('kpi-meta-sub').innerText = `Límite mensual por ${cfg.baseU}`;
 
       document.getElementById('lbl-huella').innerText = cfg.tituloHuella;
       document.getElementById('kpi-huella').innerText = `${huella.toLocaleString()} ${cfg.huellaU}`;
       document.getElementById('kpi-factor').innerText = `Factor: ${cfg.factor} ${cfg.huellaU}/${cfg.u}`;
 
+      // Actualizar Tabla Lateral
+      document.getElementById('titulo-tabla').innerText = `Desglose por Sede (Total y por ${cfg.baseU})`;
+      document.getElementById('th-kpi').innerText = `KPI / ${cfg.baseU}`;
       const tbody = document.getElementById('tabla-sedes');
       tbody.innerHTML = "";
-      Object.keys(areasSedes).forEach(s => {
+      Object.keys(datosSedesInfo).forEach(s => {
         const consSede = registrosData
           .filter(r => r.recurso === recursoActual && r.sede === s)
           .reduce((a, b) => a + b.consumo, 0);
-        const kpiSede = (consSede / areasSedes[s]).toFixed(3);
+        const baseSede = obtenerBaseSede(s, recursoActual);
+        const kpiSede = (consSede / baseSede).toFixed(3);
         tbody.innerHTML += `
           <tr>
             <td class="p-2 font-semibold text-slate-700">${s.replace("EULEN ", "")}</td>
@@ -468,23 +514,23 @@ HTML
       });
 
       document.getElementById('titulo-grafico').innerText =
-        `Evolución Mensual (${recursoActual} - ${sedeSel}): Ratio Real (${cfg.u}/m²) vs Meta (${cfg.meta})`;
+        `Evolución Mensual (${recursoActual} - ${sedeSel}): Ratio Real (${cfg.u}/${cfg.baseU}) vs Meta (${cfg.meta})`;
 
       // Escala dinámica adaptada al consumo real
       const maxDatoReal = mesesConDatos.length > 0 ? Math.max(...mesesConDatos) : 0;
       const datasets = [
         {
-          label: `KPI Real (${cfg.u}/m²)`,
+          label: `KPI Real (${cfg.u}/${cfg.baseU})`,
           data: porMes,
           backgroundColor: '#739600', // Pantone 377 C
           borderRadius: 6,
-          minBarLength: 6 // Asegura que barras muy pequeñas siempre sean visibles
+          minBarLength: 6
         }
       ];
 
       if (mostrarMeta) {
         datasets.push({
-          label: `Meta Fija (${cfg.meta} ${cfg.u}/m²)`,
+          label: `Meta Fija (${cfg.meta} ${cfg.u}/${cfg.baseU})`,
           data: Array(12).fill(cfg.meta),
           type: 'line',
           borderColor: '#F5333F', // Pantone Red 032 C
