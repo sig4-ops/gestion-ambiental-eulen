@@ -1,3 +1,6 @@
+HTML
+
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -9,37 +12,79 @@
 </head>
 <body class="bg-slate-50 text-slate-800 font-sans">
 
-  <!-- CABECERA -->
-  <header class="bg-emerald-900 text-white shadow-md">
+  <!-- CABECERA CORPORATIVA (Pantone 377 C: #739600) -->
+  <header style="background-color: #739600;" class="text-white shadow-md">
     <div class="max-w-6xl mx-auto px-4 py-4 flex flex-wrap justify-between items-center gap-4">
-      <div>
-        <h1 class="text-xl font-bold tracking-tight">🌿 EcoTrack EULEN Perú</h1>
-        <p class="text-xs text-emerald-200">Control de Indicadores Ambientales · Formato F-858-080-0041</p>
+      <div class="flex items-center gap-3.5">
+        <!-- LOGO EULEN (Esquina superior izquierda) -->
+        <div class="bg-white p-1.5 rounded-lg shadow-sm flex items-center justify-center h-12 min-w-[52px]">
+          <img id="logo-eulen" src="" alt="Logo EULEN" class="h-9 w-auto object-contain hidden" />
+          <span id="logo-fallback" class="font-extrabold text-sm tracking-wider px-2" style="color: #002664;">EULEN</span>
+        </div>
+        <div>
+          <h1 class="text-xl font-bold tracking-tight text-white">EcoTrack EULEN Perú</h1>
+          <!-- Frase en Pantone 9043 C (#E8E6DF) -->
+          <p class="text-xs font-medium" style="color: #E8E6DF;">Control de Indicadores Ambientales · Formato F-858-080-0041</p>
+        </div>
       </div>
+
+      <!-- BOTONES SUPERIORES (Pantone 9043 C: #E8E6DF) -->
       <nav class="flex gap-2">
-        <button onclick="verTab('tablero')" id="btn-tablero" class="px-4 py-2 rounded-lg text-sm font-semibold bg-emerald-600 text-white">1. Tablero y Gráficos</button>
-        <button onclick="verTab('formulario')" id="btn-formulario" class="px-4 py-2 rounded-lg text-sm font-semibold bg-emerald-800 text-emerald-100 hover:bg-emerald-700">2. Enviar Boleta</button>
+        <button onclick="verTab('tablero')" id="btn-tablero"
+          style="background-color: #E8E6DF; color: #002664;"
+          class="px-4 py-2 rounded-lg text-sm font-bold shadow-sm transition ring-2 ring-white">
+          1. Tablero y Gráficos
+        </button>
+        <button onclick="solicitarAccesoFormulario()" id="btn-formulario"
+          style="background-color: #E8E6DF; color: #002664;"
+          class="px-4 py-2 rounded-lg text-sm font-bold opacity-90 hover:opacity-100 transition">
+          🔒 2. Enviar Boleta
+        </button>
       </nav>
     </div>
   </header>
+
+  <!-- MODAL DE CONTRASEÑA PARA ENVIAR BOLETAS -->
+  <div id="modal-clave" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs hidden items-center justify-center z-50 p-4">
+    <div class="bg-white rounded-2xl shadow-xl max-w-sm w-full p-6 border border-slate-200 space-y-4">
+      <div class="text-center">
+        <div class="mx-auto w-12 h-12 rounded-full flex items-center justify-center text-white font-bold text-xl mb-2" style="background-color: #002664;">🔒</div>
+        <h3 class="text-lg font-bold text-slate-800">Acceso Restringido</h3>
+        <p class="text-xs text-slate-500 mt-1">Ingresa la clave corporativa para registrar boletas ambientales.</p>
+      </div>
+      <div>
+        <input type="password" id="input-clave" placeholder="Contraseña"
+          onkeydown="if(event.key==='Enter') validarClave()"
+          class="w-full border border-slate-300 rounded-lg p-2.5 text-center text-sm font-semibold tracking-wider focus:outline-none focus:ring-2 focus:ring-slate-400" />
+        <p id="error-clave" class="text-xs font-semibold text-center mt-1.5 hidden" style="color: #F5333F;">❌ Contraseña incorrecta. Intenta nuevamente.</p>
+      </div>
+      <div class="flex gap-2">
+        <button onclick="cerrarModalClave()" class="w-1/2 py-2.5 rounded-lg text-xs font-bold bg-slate-100 text-slate-700 hover:bg-slate-200">Cancelar</button>
+        <button onclick="validarClave()" style="background-color: #002664;" class="w-1/2 py-2.5 rounded-lg text-xs font-bold text-white hover:opacity-95">Ingresar</button>
+      </div>
+    </div>
+  </div>
 
   <main class="max-w-6xl mx-auto px-4 py-6">
 
     <!-- SECCIÓN 1: TABLERO Y GRÁFICOS -->
     <section id="sec-tablero" class="space-y-6">
-
-      <!-- BARRA DE BOTONES POR INDICADOR + DESPLEGABLE DE SEDE -->
       <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200 space-y-4">
         <div class="flex flex-wrap justify-between items-center gap-3">
-          <!-- Botones por Indicador -->
+          <!-- BOTONES POR INDICADOR -->
           <div class="flex flex-wrap gap-2" id="botones-recurso">
-            <button onclick="seleccionarRecurso('LUZ')" data-rec="LUZ" class="btn-rec px-4 py-2 rounded-lg text-sm font-bold bg-emerald-600 text-white shadow-sm">⚡ Luz (kWh)</button>
-            <button onclick="seleccionarRecurso('AGUA')" data-rec="AGUA" class="btn-rec px-4 py-2 rounded-lg text-sm font-bold bg-slate-100 text-slate-700 hover:bg-slate-200">💧 Agua (m³)</button>
-            <button onclick="seleccionarRecurso('PAPEL')" data-rec="PAPEL" class="btn-rec px-4 py-2 rounded-lg text-sm font-bold bg-slate-100 text-slate-700 hover:bg-slate-200">📄 Papel (kg)</button>
-            <button onclick="seleccionarRecurso('COMBUSTIBLE')" data-rec="COMBUSTIBLE" class="btn-rec px-4 py-2 rounded-lg text-sm font-bold bg-slate-100 text-slate-700 hover:bg-slate-200">⛽ Combustible (gal)</button>
+            <button onclick="seleccionarRecurso('LUZ')" data-rec="LUZ"
+              style="background-color: #002664; color: #FFFFFF;"
+              class="btn-rec px-4 py-2 rounded-lg text-sm font-bold shadow-sm transition">⚡ Luz (kWh)</button>
+            <button onclick="seleccionarRecurso('AGUA')" data-rec="AGUA"
+              class="btn-rec px-4 py-2 rounded-lg text-sm font-bold bg-slate-100 text-slate-700 hover:bg-slate-200 transition">💧 Agua (m³)</button>
+            <button onclick="seleccionarRecurso('PAPEL')" data-rec="PAPEL"
+              class="btn-rec px-4 py-2 rounded-lg text-sm font-bold bg-slate-100 text-slate-700 hover:bg-slate-200 transition">📄 Papel (kg)</button>
+            <button onclick="seleccionarRecurso('COMBUSTIBLE')" data-rec="COMBUSTIBLE"
+              class="btn-rec px-4 py-2 rounded-lg text-sm font-bold bg-slate-100 text-slate-700 hover:bg-slate-200 transition">⛽ Combustible (gal)</button>
           </div>
 
-          <!-- Desplegable de Sede (General + Individuales) + Botón Refrescar -->
+          <!-- DESPLEGABLE DE SEDE + BOTÓN ACTUALIZAR (Pantone Red 032 C: #F5333F) -->
           <div class="flex flex-wrap items-center gap-2">
             <select id="filtro-sede" onchange="actualizarGraficos()" class="border border-slate-300 rounded-lg px-3 py-2 text-sm font-semibold bg-slate-50 text-slate-800">
               <option value="GENERAL">🏢 Consolidado General (Todas las Sedes)</option>
@@ -50,7 +95,9 @@
               <option value="EULEN PUEBLO LIBRE">Sede: EULEN PUEBLO LIBRE (380 m²)</option>
               <option value="EULEN SANTA ANITA">Sede: EULEN SANTA ANITA (950 m²)</option>
             </select>
-            <button onclick="cargarDatosEnVivo()" id="btn-sync" class="px-3 py-2 rounded-lg text-xs font-bold bg-slate-800 text-white hover:bg-slate-700" title="Sincronizar con Google Sheets">
+            <button onclick="cargarDatosEnVivo()" id="btn-sync"
+              style="background-color: #F5333F; color: #FFFFFF;"
+              class="px-3.5 py-2 rounded-lg text-xs font-bold shadow-sm hover:opacity-90 transition">
               🔄 Actualizar
             </button>
           </div>
@@ -58,7 +105,7 @@
         <p id="estado-sync" class="text-xs text-slate-500">Cargando datos en vivo desde Google Sheets...</p>
       </div>
 
-      <!-- TARJETAS KPI (INCLUYE TOTAL POR ÁREA) -->
+      <!-- TARJETAS KPI -->
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
         <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200">
           <p class="text-xs text-slate-500 font-semibold uppercase">Área Evaluada</p>
@@ -68,16 +115,18 @@
         <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200">
           <p class="text-xs text-slate-500 font-semibold uppercase">Consumo Acumulado</p>
           <p id="kpi-acum" class="text-2xl font-bold text-slate-800 mt-1">0</p>
-          <p id="kpi-gasto" class="text-xs text-emerald-700 font-semibold mt-1">Gasto: S/ 0.00</p>
+          <p id="kpi-gasto" class="text-xs font-semibold mt-1" style="color: #739600;">Gasto: S/ 0.00</p>
         </div>
         <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200">
           <p class="text-xs text-slate-500 font-semibold uppercase">Total por Área (KPI)</p>
-          <p id="kpi-ratio" class="text-2xl font-bold text-emerald-600 mt-1">0.000</p>
+          <!-- Valor Total por Área en Pantone 281 C (#002664) -->
+          <p id="kpi-ratio" class="text-2xl font-bold mt-1" style="color: #002664;">0.000</p>
           <p id="kpi-estado" class="text-xs font-semibold text-slate-500 mt-1">Consumo / m²</p>
         </div>
         <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200">
           <p class="text-xs text-slate-500 font-semibold uppercase">Meta Fija</p>
-          <p id="kpi-meta" class="text-2xl font-bold text-emerald-700 mt-1">2.580</p>
+          <!-- Valor Meta Fija en Pantone Red 032 C (#F5333F) -->
+          <p id="kpi-meta" class="text-2xl font-bold mt-1" style="color: #F5333F;">2.580</p>
           <p class="text-xs text-slate-500 mt-1">Límite mensual por m²</p>
         </div>
         <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200">
@@ -87,10 +136,16 @@
         </div>
       </div>
 
-      <!-- GRÁFICO PRINCIPAL + TABLA COMPARATIVA POR SEDE -->
+      <!-- GRÁFICO PRINCIPAL + TABLA DESGLOSE -->
       <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 lg:col-span-2">
-          <h3 id="titulo-grafico" class="font-bold text-sm text-slate-700 mb-4">Evolución Mensual: KPI Real vs Meta Fija</h3>
+          <div class="flex flex-wrap justify-between items-center gap-2 mb-4">
+            <h3 id="titulo-grafico" class="font-bold text-sm text-slate-700">Evolución Mensual: KPI Real vs Meta Fija</h3>
+            <label class="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-600 cursor-pointer bg-slate-100 px-2.5 py-1 rounded-md">
+              <input type="checkbox" id="chk-mostrar-meta" checked onchange="actualizarGraficos()" class="rounded" />
+              Mostrar línea de Meta
+            </label>
+          </div>
           <div class="h-72">
             <canvas id="graficoPrincipal"></canvas>
           </div>
@@ -199,7 +254,7 @@
             <input type="file" id="archivo" accept=".pdf,image/*" required class="w-full border border-slate-300 rounded-lg p-2 text-sm bg-slate-50" />
           </div>
 
-          <button type="submit" id="btn-enviar" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 rounded-lg shadow transition">
+          <button type="submit" id="btn-enviar" style="background-color: #739600;" class="w-full hover:opacity-95 text-white font-bold py-3 rounded-lg shadow transition">
             Enviar Boleta y Notificar al SIG
           </button>
           <p id="mensaje-estado" class="text-center text-sm font-semibold hidden"></p>
@@ -211,9 +266,61 @@
 
   <script>
     // =====================================================================
-    // PEGA AQUÍ TU URL /exec DE GOOGLE APPS SCRIPT:
+    // 1. PEGA AQUÍ TU URL /exec DE GOOGLE APPS SCRIPT:
     // =====================================================================
     const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbypdUbs0klNZDay8glfjmYNg8W4WoUoO7UkRqj3Pm-jddif9YU7iU9bM97urREIgcL2/exec";
+
+    // =====================================================================
+    // 2. PEGA AQUÍ EL LINK COMPARTIDO DE GOOGLE DRIVE DE TU LOGO EULEN:
+    //    (Asegúrate de que en Drive esté como "Cualquier persona con el enlace")
+    // =====================================================================
+    const LOGO_DRIVE_URL = "https://drive.google.com/file/d/1KJGPFT2WWTYzQCo9iQ8MJbMSi-gvd5Bw/view?usp=sharing";
+
+    // Conversor automático de link de Google Drive a imagen directa
+    (function cargarLogo() {
+      if (!LOGO_DRIVE_URL || LOGO_DRIVE_URL.includes("PEGA_AQUI")) return;
+      const match = LOGO_DRIVE_URL.match(/\/d\/([a-zA-Z0-9_-]+)/) || LOGO_DRIVE_URL.match(/id=([a-zA-Z0-9_-]+)/);
+      const finalUrl = match ? `https://drive.google.com/thumbnail?id=${match[1]}&sz=w300` : LOGO_DRIVE_URL;
+      const img = document.getElementById("logo-eulen");
+      const fallback = document.getElementById("logo-fallback");
+      img.onload = () => { img.classList.remove("hidden"); fallback.classList.add("hidden"); };
+      img.src = finalUrl;
+    })();
+
+    // Control de Contraseña (EULEN.2026)
+    const CLAVE_AUTORIZADA = "EULEN.2026";
+    let sesionAutorizada = false;
+
+    function solicitarAccesoFormulario() {
+      if (sesionAutorizada) {
+        verTab('formulario');
+        return;
+      }
+      document.getElementById('input-clave').value = "";
+      document.getElementById('error-clave').classList.add('hidden');
+      const modal = document.getElementById('modal-clave');
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+      setTimeout(() => document.getElementById('input-clave').focus(), 100);
+    }
+
+    function cerrarModalClave() {
+      const modal = document.getElementById('modal-clave');
+      modal.classList.add('hidden');
+      modal.classList.remove('flex');
+    }
+
+    function validarClave() {
+      const ingresada = document.getElementById('input-clave').value.trim();
+      if (ingresada === CLAVE_AUTORIZADA) {
+        sesionAutorizada = true;
+        cerrarModalClave();
+        document.getElementById('btn-formulario').innerText = "🔓 2. Enviar Boleta";
+        verTab('formulario');
+      } else {
+        document.getElementById('error-clave').classList.remove('hidden');
+      }
+    }
 
     const mesesOrden = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
     const unidadesMap = {
@@ -223,7 +330,6 @@
       COMBUSTIBLE: { u: "gal", huellaU: "kg CO₂e", factor: 10.15, meta: 0.03, tituloHuella: "Huella de Carbono" }
     };
 
-    // Datos iniciales de respaldo (Ene-Oct 2026) mientras sincroniza con Google Sheets
     let areasSedes = {
       "EULEN SUR": 165, "EULEN NORTE": 2977, "EULEN ATE": 1200,
       "EULEN SAN ISIDRO": 450, "EULEN PUEBLO LIBRE": 380, "EULEN SANTA ANITA": 950
@@ -243,17 +349,31 @@
     function verTab(tab) {
       document.getElementById('sec-tablero').classList.toggle('hidden', tab !== 'tablero');
       document.getElementById('sec-formulario').classList.toggle('hidden', tab !== 'formulario');
-      document.getElementById('btn-tablero').className = tab === 'tablero' ? 'px-4 py-2 rounded-lg text-sm font-semibold bg-emerald-600 text-white' : 'px-4 py-2 rounded-lg text-sm font-semibold bg-emerald-800 text-emerald-100';
-      document.getElementById('btn-formulario').className = tab === 'formulario' ? 'px-4 py-2 rounded-lg text-sm font-semibold bg-emerald-600 text-white' : 'px-4 py-2 rounded-lg text-sm font-semibold bg-emerald-800 text-emerald-100';
+
+      const btnTab = document.getElementById('btn-tablero');
+      const btnForm = document.getElementById('btn-formulario');
+      if (tab === 'tablero') {
+        btnTab.classList.add('ring-2', 'ring-white');
+        btnForm.classList.remove('ring-2', 'ring-white');
+      } else {
+        btnForm.classList.add('ring-2', 'ring-white');
+        btnTab.classList.remove('ring-2', 'ring-white');
+      }
     }
 
     function seleccionarRecurso(rec) {
       recursoActual = rec;
       document.querySelectorAll('.btn-rec').forEach(btn => {
         const activo = btn.getAttribute('data-rec') === rec;
-        btn.className = activo
-          ? 'btn-rec px-4 py-2 rounded-lg text-sm font-bold bg-emerald-600 text-white shadow-sm'
-          : 'btn-rec px-4 py-2 rounded-lg text-sm font-bold bg-slate-100 text-slate-700 hover:bg-slate-200';
+        if (activo) {
+          btn.style.backgroundColor = "#002664";
+          btn.style.color = "#FFFFFF";
+          btn.className = "btn-rec px-4 py-2 rounded-lg text-sm font-bold shadow-sm transition";
+        } else {
+          btn.style.backgroundColor = "";
+          btn.style.color = "";
+          btn.className = "btn-rec px-4 py-2 rounded-lg text-sm font-bold bg-slate-100 text-slate-700 hover:bg-slate-200 transition";
+        }
       });
       actualizarGraficos();
     }
@@ -266,6 +386,7 @@
     async function cargarDatosEnVivo() {
       const statusEl = document.getElementById('estado-sync');
       statusEl.innerText = "🔄 Sincronizando con Google Sheets...";
+      actualizarGraficos();
       try {
         const res = await fetch(GOOGLE_SCRIPT_URL);
         const json = await res.json();
@@ -281,36 +402,31 @@
             });
           }
           statusEl.innerText = `✅ Conectado en vivo con Google Sheets (${registrosData.length} registros cargados).`;
-          statusEl.className = "text-xs text-emerald-700 font-medium";
+          statusEl.className = "text-xs font-medium";
+          statusEl.style.color = "#739600";
           actualizarGraficos();
         }
       } catch (e) {
-        statusEl.innerText = "⚠️ Mostrando datos locales de respaldo (verifica la URL de Google Script para lectura en vivo).";
-        actualizarGraficos();
+        statusEl.innerText = "⚠️ Mostrando datos locales de respaldo.";
       }
     }
 
     function actualizarGraficos() {
       const sedeSel = document.getElementById('filtro-sede').value;
       const cfg = unidadesMap[recursoActual];
+      const mostrarMeta = document.getElementById('chk-mostrar-meta').checked;
 
-      // Filtrar registros del recurso seleccionado
       const filtrados = registrosData.filter(r =>
         r.recurso === recursoActual && (sedeSel === "GENERAL" || r.sede === sedeSel)
       );
 
-      // Calcular área evaluada (Total de todas las sedes o de la sede elegida)
-      let areaTotal = 0;
-      if (sedeSel === "GENERAL") {
-        areaTotal = Object.values(areasSedes).reduce((a, b) => a + b, 0);
-      } else {
-        areaTotal = areasSedes[sedeSel] || 1;
-      }
+      let areaTotal = sedeSel === "GENERAL"
+        ? Object.values(areasSedes).reduce((a, b) => a + b, 0)
+        : (areasSedes[sedeSel] || 1);
 
       const consumoAcum = filtrados.reduce((a, b) => a + b.consumo, 0);
       const gastoAcum = filtrados.reduce((a, b) => a + b.monto, 0);
 
-      // Agrupar consumo por mes para calcular KPI mensual (Consumo del mes / Área)
       const porMes = mesesOrden.map(m => {
         const sumMes = filtrados.filter(r => r.mes === m).reduce((a, b) => a + b.consumo, 0);
         return sumMes > 0 ? +(sumMes / areaTotal).toFixed(4) : null;
@@ -323,7 +439,6 @@
       const totalPorAreaAcum = +(consumoAcum / areaTotal).toFixed(3);
       const huella = +(consumoAcum * cfg.factor).toFixed(1);
 
-      // Actualizar Tarjetas
       document.getElementById('kpi-area').innerText = `${areaTotal.toLocaleString()} m²`;
       document.getElementById('kpi-area-sub').innerText = sedeSel === "GENERAL" ? "Área total 6 sedes" : sedeSel;
       document.getElementById('kpi-acum').innerText = `${consumoAcum.toLocaleString()} ${cfg.u}`;
@@ -337,7 +452,6 @@
       document.getElementById('kpi-huella').innerText = `${huella.toLocaleString()} ${cfg.huellaU}`;
       document.getElementById('kpi-factor').innerText = `Factor: ${cfg.factor} ${cfg.huellaU}/${cfg.u}`;
 
-      // Actualizar Tabla Desglose por Sede
       const tbody = document.getElementById('tabla-sedes');
       tbody.innerHTML = "";
       Object.keys(areasSedes).forEach(s => {
@@ -349,13 +463,36 @@
           <tr>
             <td class="p-2 font-semibold text-slate-700">${s.replace("EULEN ", "")}</td>
             <td class="p-2 text-right">${consSede.toLocaleString()} ${cfg.u}</td>
-            <td class="p-2 text-right font-bold text-emerald-700">${kpiSede}</td>
+            <td class="p-2 text-right font-bold" style="color: #002664;">${kpiSede}</td>
           </tr>`;
       });
 
-      // Actualizar Gráfico
       document.getElementById('titulo-grafico').innerText =
         `Evolución Mensual (${recursoActual} - ${sedeSel}): Ratio Real (${cfg.u}/m²) vs Meta (${cfg.meta})`;
+
+      // Escala dinámica adaptada al consumo real
+      const maxDatoReal = mesesConDatos.length > 0 ? Math.max(...mesesConDatos) : 0;
+      const datasets = [
+        {
+          label: `KPI Real (${cfg.u}/m²)`,
+          data: porMes,
+          backgroundColor: '#739600', // Pantone 377 C
+          borderRadius: 6,
+          minBarLength: 6 // Asegura que barras muy pequeñas siempre sean visibles
+        }
+      ];
+
+      if (mostrarMeta) {
+        datasets.push({
+          label: `Meta Fija (${cfg.meta} ${cfg.u}/m²)`,
+          data: Array(12).fill(cfg.meta),
+          type: 'line',
+          borderColor: '#F5333F', // Pantone Red 032 C
+          backgroundColor: '#F5333F',
+          borderWidth: 2,
+          pointRadius: 0
+        });
+      }
 
       const ctx = document.getElementById('graficoPrincipal').getContext('2d');
       if (chartInstance) chartInstance.destroy();
@@ -363,24 +500,20 @@
         type: 'bar',
         data: {
           labels: mesesOrden.map(m => m.slice(0, 3)),
-          datasets: [
-            {
-              label: `KPI Real (${cfg.u}/m²)`,
-              data: porMes,
-              backgroundColor: '#059669',
-              borderRadius: 6
-            },
-            {
-              label: `Meta Fija (${cfg.meta} ${cfg.u}/m²)`,
-              data: Array(12).fill(cfg.meta),
-              type: 'line',
-              borderColor: '#dc2626',
-              borderWidth: 2,
-              pointRadius: 0
-            }
-          ]
+          datasets: datasets
         },
-        options: { responsive: true, maintainAspectRatio: false }
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          scales: {
+            y: {
+              beginAtZero: true,
+              suggestedMax: mostrarMeta
+                ? Math.max(maxDatoReal * 1.15, cfg.meta * 1.1)
+                : (maxDatoReal > 0 ? maxDatoReal * 1.25 : 1)
+            }
+          }
+        }
       });
     }
 
@@ -417,12 +550,14 @@
             body: JSON.stringify(payload)
           });
           msg.innerText = "✅ ¡Boleta enviada! Actualizando gráficos en vivo...";
-          msg.className = "text-center text-sm font-semibold text-emerald-700 mt-3 block";
+          msg.className = "text-center text-sm font-semibold mt-3 block";
+          msg.style.color = "#739600";
           document.getElementById('formBoleta').reset();
           setTimeout(() => cargarDatosEnVivo(), 2000);
         } catch (err) {
           msg.innerText = "❌ Error de conexión. Verifica la URL de Google Script.";
-          msg.className = "text-center text-sm font-semibold text-red-600 mt-3 block";
+          msg.className = "text-center text-sm font-semibold mt-3 block";
+          msg.style.color = "#F5333F";
         } finally {
           btn.disabled = false;
           btn.innerText = "Enviar Boleta y Notificar al SIG";
